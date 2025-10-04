@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+</head>
+<body>
+    {% extends "base.html" %}
+{% block content %}
+  <h2>All Tickets</h2>
+  <a href="{% url 'ticket_create' %}">Create New Ticket</a>
+ <ul>
+  {% for ticket in tickets %}
+    <li>
+      <a href="{% url 'ticket_detail' ticket.pk %}">{{ ticket.title }}</a>
+     {% if ticket.due_date and ticket.status != "Closed" %}
+    {% if ticket.due_date < today %}
+        <span class="badge bg-danger">SLA Breached</span>
+    {% else %}
+        <span class="badge bg-success">Within SLA</span>
+    {% endif %}
+{% endif %}
+
+    </li>
+  {% endfor %}
+</ul>
+
+{% endblock %}
+
+</body>
+</html>

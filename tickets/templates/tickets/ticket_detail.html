@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+</head>
+<body>
+   {% extends "base.html" %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-10 col-lg-8">
+    <div class="card shadow-sm mb-4">
+      <div class="card-header bg-info text-white">
+        <h4 class="mb-0">{{ ticket.title }}</h4>
+      </div>
+      <div class="card-body">
+        <p><strong>Description:</strong> {{ ticket.description }}</p>
+        <p><strong>Status:</strong> {{ ticket.status }}</p>
+        <p><strong>Priority:</strong> {{ ticket.priority }}</p>
+        <p><strong>Due Date:</strong> {{ ticket.due_date }}</p>
+        <p><strong>Created by:</strong> {{ ticket.user.username }}</p>
+        {% if ticket.due_date and ticket.status != "Closed" %}
+          {% if ticket.due_date < today %}
+            <span class="badge bg-danger">SLA Breached</span>
+          {% else %}
+            <span class="badge bg-success">Within SLA</span>
+          {% endif %}
+        {% endif %}
+         {% if ticket.user == user or user.is_staff %}
+          <div class="mt-3">
+            <a href="{% url 'ticket_edit' ticket.pk %}" class="btn btn-warning">Edit Ticket</a>
+          </div>
+        {% endif %}
+        {% if can_edit %}
+  <a href="{% url 'ticket_edit' ticket.pk %}">Edit</a>
+{% endif %}
+
+      </div>
+    </div>
+      </div>
+    </div>
+    <div class="card shadow-sm mb-4">
+      <div class="card-header bg-secondary text-white">
+        <h5 class="mb-0">Comments</h5>
+      </div>
+      <div class="card-body">
+        <ul class="list-group mb-3">
+          {% for comment in comments %}
+            <li class="list-group-item">
+              <strong>{{ comment.user.username }}:</strong> {{ comment.content }}
+              <span class="text-muted small">({{ comment.created_at }})</span>
+            </li>
+          {% empty %}
+            <li class="list-group-item text-muted">No comments yet.</li>
+          {% endfor %}
+        </ul>
+        <h6>Add a Comment</h6>
+        <form method="post">
+          {% csrf_token %}
+          {% for field in form %}
+            <div class="mb-2">
+              {{ field.label_tag }} 
+              {{ field }}
+              {% if field.errors %}
+                <div class="text-danger small">{{ field.errors }}</div>
+              {% endif %}
+            </div>
+          {% endfor %}
+          <button type="submit" class="btn btn-success">Add Comment</button>
+          <a href="{% url 'ticket_list' %}" class="btn btn-secondary ms-2">Back to Tickets</a>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+
+</body>
+</html>
